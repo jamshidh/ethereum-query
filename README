@@ -1,0 +1,5 @@
+
+This package contains tools to query the ethereum databases.
+
+This tool works in conjunction with the ethereum-client-haskell package.
+
