@@ -12,7 +12,7 @@ import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (</>))
 
 import Blockchain.Data.RLP
 
-import Blockchain.VM.Code
+import Blockchain.Data.Code
 
 import DumpLevelDB
 
@@ -21,10 +21,10 @@ import Blockchain.Format
 --import Debug.Trace
 
 formatCode::Code->String
-formatCode = show . pretty
+formatCode = show
 
 doit::String->String->IO ()
-doit dbtype h = showKeyVal (formatCode . bytes2Code) dbtype "state" (if h == "-" then Nothing else Just h)
+doit dbtype h = showKeyVal (formatCode . Code) dbtype "state" (if h == "-" then Nothing else Just h)
 
 
 

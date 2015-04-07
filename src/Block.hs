@@ -18,7 +18,7 @@ import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (</>))
 
 import Blockchain.Data.RLP
 
-import Blockchain.Data.Block
+import Blockchain.Data.BlockDB
 
 import DumpLevelDB
 

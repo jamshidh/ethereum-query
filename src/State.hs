@@ -20,6 +20,7 @@ import qualified Data.NibbleString as N
 import Blockchain.Data.RLP
 
 import Blockchain.Context
+import Blockchain.DBM
 import Blockchain.ExtDBs
 import Blockchain.Format
 
@@ -27,18 +28,21 @@ formatKV::(N.NibbleString, RLPObject)->Doc
 formatKV (key, val) =
     pretty key <> text ": " <> pretty (rlpDeserialize $ rlpDecode val)
 
-showVals::SHAPtr->ContextM ()
-showVals sr = do
-    setStateRoot sr
+--showVals::SHAPtr->ContextM ()
+showVals sr = undefined -- do
+{-    setStateRoot sr
     kvs <- getKeyVals ""
     --liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> kvs) ""
-    liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> filter (filterUnnecessary . fst) kvs) ""
+    liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> filter (filterUnnecessary . fst) kvs) "" -}
 
 doit::String->SHAPtr->IO()
 doit theType sr = do
   DB.runResourceT $ do
     cxt <- openDBs theType
-    _ <- liftIO $ runStateT (showVals sr) cxt
+    _ <- liftIO $
+         flip runStateT cxt $
+         flip runStateT (Context [] 0 [] False) $
+         showVals sr
     return ()
 
 filterUnnecessary::N.NibbleString->Bool

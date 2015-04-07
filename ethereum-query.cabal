@@ -27,6 +27,7 @@ executable queryEth
                  , binary
                  , bytestring
                  , containers
+                 , ethereum-data-leveldb
                  , ethereum-rlp
                  , ethereum-merkle-patricia-db
                  , filepath

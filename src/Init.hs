@@ -13,7 +13,7 @@ import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (</>))
 
 import Blockchain.Data.RLP
 
-import Blockchain.Data.Block
+import Blockchain.Data.BlockDB
 import Blockchain.Data.SignedTransaction
 import Blockchain.Data.Transaction
 import Blockchain.Data.TransactionReceipt
@@ -47,7 +47,7 @@ showInit MessageTX {} = ""
 
 
 doit::String->String->IO ()
-doit dbtype h = showKeyVal (intercalate "\n" . map (showInit . unsignedTransaction) . receiptTransactions . rlpDecode . rlpDeserialize) dbtype "blocks" (if h == "-" then Nothing else Just h)
+doit dbtype h = showKeyVal (intercalate "\n" . map (showInit . unsignedTransaction) . blockReceiptTransactions . rlpDecode . rlpDeserialize) dbtype "blocks" (if h == "-" then Nothing else Just h)
 
 
 

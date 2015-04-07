@@ -68,5 +68,6 @@ typeToDB "h" = do
   return $ homeDir </> ".ethereumH"
 typeToDB "c" = do
   homeDir <- getHomeDirectory
-  return $ homeDir </> "Library" </> "Application Support" </> "Ethereum"
+  --return $ homeDir </> "Library" </> "Application Support" </> "Ethereum"
+  return $ homeDir </> ".ethereum"
 
