@@ -23,26 +23,28 @@ import Blockchain.Context
 import Blockchain.DBM
 import Blockchain.ExtDBs
 import Blockchain.Format
+import qualified Blockchain.Database.MerklePatricia as MP
 
 formatKV::(N.NibbleString, RLPObject)->Doc
 formatKV (key, val) =
     pretty key <> text ": " <> pretty (rlpDeserialize $ rlpDecode val)
 
 --showVals::SHAPtr->ContextM ()
-showVals sr = undefined -- do
-{-    setStateRoot sr
-    kvs <- getKeyVals ""
+showVals dbs sr = do
+  --setStateRoot sr
+    kvs <- MP.unsafeGetKeyVals (stateDB dbs){MP.stateRoot=sr} ""
+    liftIO $ putStrLn $ show $ length kvs
     --liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> kvs) ""
-    liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> filter (filterUnnecessary . fst) kvs) "" -}
+    liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> filter (filterUnnecessary . fst) kvs) "" 
 
 doit::String->SHAPtr->IO()
 doit theType sr = do
   DB.runResourceT $ do
-    cxt <- openDBs theType
-    _ <- liftIO $
-         flip runStateT cxt $
-         flip runStateT (Context [] 0 [] False) $
-         showVals sr
+    dbs <- openDBs theType
+--    _ <- liftIO $
+--         flip runStateT dbs $
+--         flip runStateT (Context [] 0 [] False) $ -
+    showVals dbs sr
     return ()
 
 filterUnnecessary::N.NibbleString->Bool
