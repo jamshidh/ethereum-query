@@ -13,38 +13,48 @@ import qualified Data.ByteString.Char8 as BC
 import Data.Functor
 import Data.List
 import qualified Database.LevelDB as DB
+import System.Directory
 import System.Environment
-import Text.PrettyPrint.ANSI.Leijen hiding ((<$>))
+import System.FilePath
+import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (</>))
 
 import qualified Data.NibbleString as N
 import Blockchain.Data.RLP
 
+import Blockchain.Constants
 import Blockchain.Context
+import Blockchain.DB.StateDB
 import Blockchain.DBM
 import Blockchain.ExtDBs
 import Blockchain.Format
 import qualified Blockchain.Database.MerklePatricia as MP
+import qualified Blockchain.Database.MerklePatricia.Internal as MP
 
 formatKV::(N.NibbleString, RLPObject)->Doc
 formatKV (key, val) =
     pretty key <> text ": " <> pretty (rlpDeserialize $ rlpDecode val)
 
 --showVals::SHAPtr->ContextM ()
-showVals dbs sr = do
+showVals sdb sr = do
   --setStateRoot sr
-    kvs <- MP.unsafeGetKeyVals (stateDB dbs){MP.stateRoot=sr} ""
-    liftIO $ putStrLn $ show $ length kvs
-    --liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> kvs) ""
-    liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> filter (filterUnnecessary . fst) kvs) "" 
+  kvs <- MP.unsafeGetKeyVals MP.MPDB{MP.ldb=sdb, MP.stateRoot=sr} ""
+  liftIO $ putStrLn $ show $ length kvs
+  --liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> kvs) ""
+  liftIO $ putStrLn $ displayS (renderPretty 1.0 200 $ vsep $ formatKV <$> filter (filterUnnecessary . fst) kvs) "" 
 
 doit::String->SHAPtr->IO()
 doit theType sr = do
   DB.runResourceT $ do
     dbs <- openDBs theType
+    homeDir <- liftIO getHomeDirectory                     
+    sdb <- DB.open (homeDir </> dbDir theType ++ stateDBPath)
+           DB.defaultOptions{DB.createIfMissing=True, DB.cacheSize=1024}
+
+
 --    _ <- liftIO $
 --         flip runStateT dbs $
 --         flip runStateT (Context [] 0 [] False) $ -
-    showVals dbs sr
+    showVals sdb sr
     return ()
 
 filterUnnecessary::N.NibbleString->Bool

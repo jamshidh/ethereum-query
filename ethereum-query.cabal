@@ -27,9 +27,12 @@ executable queryEth
                  , binary
                  , bytestring
                  , containers
-                 , ethereum-data-leveldb
+                 , ethereum-client-haskell
+                 , ethereum-data-sql
                  , ethereum-rlp
                  , ethereum-merkle-patricia-db
+                 , ethereum-util
+                 , ethereum-vm
                  , filepath
                  , time
                  , nibblestring
@@ -43,7 +46,6 @@ executable queryEth
                  , leveldb-haskell
                  , array
                  , directory
-                 , ethereum-client-haskell
     main-is: Main.hs
     other-modules:
                    Block

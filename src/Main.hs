@@ -5,7 +5,7 @@ import System.Console.CmdArgs
 
 import State
 import Block
-import Init
+--import Init
 import Code
 
 --import Debug.Trace
@@ -79,7 +79,8 @@ run Block{hash=h, db=db'} = do
   Block.doit db' h
 
 run Init{hash=h, db=db'} = do
-  Init.doit db' h
+  undefined
+--  Init.doit db' h
 
 run Code{hash=h, db=db'} = do
   Code.doit db' h
