@@ -5,6 +5,7 @@ import System.Console.CmdArgs
 
 import State
 import Block
+import BlockGO
 --import Init
 import Code
 
@@ -22,6 +23,7 @@ import Blockchain.ExtDBs
 data Options = 
   State{root::String, db::String} 
   | Block{hash::String, db::String} 
+  | BlockGO{hash::String, db::String} 
   | Code{hash::String, db::String}
   | Init{hash::String, db::String}
   deriving (Show, Data, Typeable)
@@ -36,6 +38,13 @@ stateOptions =
 blockOptions::Annotate Ann
 blockOptions = 
   record Block{hash=undefined, db=undefined} [
+    hash := def += typ "FILENAME" += argPos 1 += opt ("-"::String),
+    db := def += typ "DBSTRING" += argPos 0
+    ]
+
+blockGoOptions::Annotate Ann
+blockGoOptions = 
+  record BlockGO{hash=undefined, db=undefined} [
     hash := def += typ "FILENAME" += argPos 1 += opt ("-"::String),
     db := def += typ "DBSTRING" += argPos 0
     ]
@@ -55,7 +64,7 @@ codeOptions =
     ]
 
 options::Annotate Ann
-options = modes_ [stateOptions, blockOptions, initOptions, codeOptions]
+options = modes_ [stateOptions, blockOptions, blockGoOptions, initOptions, codeOptions]
 
 
 --      += summary "Apply shims, reorganize, and generate to the input"
@@ -77,6 +86,9 @@ run State{root=r, db=db'} = do
 
 run Block{hash=h, db=db'} = do
   Block.doit db' h
+
+run BlockGO{hash=h, db=db'} = do
+  BlockGO.doit db' h
 
 run Init{hash=h, db=db'} = do
   undefined
