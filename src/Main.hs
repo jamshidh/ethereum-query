@@ -6,6 +6,7 @@ import System.Console.CmdArgs
 import State
 import Block
 import BlockGO
+import Hash
 --import Init
 import Code
 
@@ -24,6 +25,7 @@ data Options =
   State{root::String, db::String} 
   | Block{hash::String, db::String} 
   | BlockGO{hash::String, db::String} 
+  | Hash{hash::String, db::String} 
   | Code{hash::String, db::String}
   | Init{hash::String, db::String}
   deriving (Show, Data, Typeable)
@@ -49,6 +51,14 @@ blockGoOptions =
     db := def += typ "DBSTRING" += argPos 0
     ]
 
+hashOptions::Annotate Ann
+hashOptions = 
+  record Hash{hash=undefined, db=undefined} [
+    hash := def += typ "FILENAME" += argPos 1 += opt ("-"::String),
+    db := def += typ "DBSTRING" += argPos 0
+    ]
+
+
 initOptions::Annotate Ann
 initOptions = 
   record Init{hash=undefined, db=undefined} [
@@ -64,7 +74,7 @@ codeOptions =
     ]
 
 options::Annotate Ann
-options = modes_ [stateOptions, blockOptions, blockGoOptions, initOptions, codeOptions]
+options = modes_ [stateOptions, blockOptions, blockGoOptions, hashOptions, initOptions, codeOptions]
 
 
 --      += summary "Apply shims, reorganize, and generate to the input"
@@ -89,6 +99,9 @@ run Block{hash=h, db=db'} = do
 
 run BlockGO{hash=h, db=db'} = do
   BlockGO.doit db' h
+         
+run Hash{hash=h, db=db'} = do
+  Hash.doit db' h
 
 run Init{hash=h, db=db'} = do
   undefined
