@@ -9,6 +9,8 @@ import BlockGO
 import Hash
 --import Init
 import Code
+import Raw
+import RawMP
 
 --import Debug.Trace
 
@@ -27,6 +29,8 @@ data Options =
   | BlockGO{hash::String, db::String} 
   | Hash{hash::String, db::String} 
   | Code{hash::String, db::String}
+  | RawMP{stateRoot::String, filename::String}
+  | Raw{filename::String}
   | Init{hash::String, db::String}
   deriving (Show, Data, Typeable)
 
@@ -73,8 +77,21 @@ codeOptions =
     db := def += typ "DBSTRING" += argPos 0
     ]
 
+rawOptions::Annotate Ann
+rawOptions = 
+  record Raw{filename=undefined} [
+    filename := def += typ "DBSTRING" += argPos 0
+    ]
+
+rawMPOptions::Annotate Ann
+rawMPOptions = 
+  record RawMP{stateRoot=undefined, filename=undefined} [
+    stateRoot := def += typ "USERAGENT" += argPos 1,
+    filename := def += typ "DBSTRING" += argPos 0
+    ]
+
 options::Annotate Ann
-options = modes_ [stateOptions, blockOptions, blockGoOptions, hashOptions, initOptions, codeOptions]
+options = modes_ [stateOptions, blockOptions, blockGoOptions, hashOptions, initOptions, codeOptions, rawOptions, rawMPOptions]
 
 
 --      += summary "Apply shims, reorganize, and generate to the input"
@@ -109,4 +126,10 @@ run Init{hash=h, db=db'} = do
 
 run Code{hash=h, db=db'} = do
   Code.doit db' h
+
+run Raw{filename=f} = do
+  Raw.doit f
+
+run RawMP{stateRoot=sr, filename=f} = do
+  RawMP.doit f (SHAPtr $ fst $ B16.decode $ BC.pack sr)
 
