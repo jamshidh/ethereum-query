@@ -50,10 +50,13 @@ executable queryEth
     main-is: Main.hs
     other-modules:
                    Block
+                   BlockGO
                    Code
                    DumpLevelDB
+                   Hash
                    Init
                    Raw
+                   RawMP
                    RLP
                    State
     buildable: True
