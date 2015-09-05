@@ -47,6 +47,7 @@ doit theType sr = do
   DB.runResourceT $ do
     dbs <- openDBs theType
     homeDir <- liftIO getHomeDirectory                     
+--    sdb <- DB.open (homeDir </> ".ethereum" </> "chaindata")
     sdb <- DB.open (homeDir </> dbDir theType ++ stateDBPath)
            DB.defaultOptions{DB.createIfMissing=True, DB.cacheSize=1024}
 
