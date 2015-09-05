@@ -24,7 +24,7 @@ formatCode::Code->String
 formatCode = show
 
 doit::String->String->IO ()
-doit dbtype h = showKeyVal (formatCode . Code) dbtype "state" (if h == "-" then Nothing else Just h)
+doit dbtype h = showKeyVal format dbtype "state" (if h == "-" then Nothing else Just h)
 
 
 
