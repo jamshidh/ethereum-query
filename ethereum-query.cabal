@@ -59,6 +59,7 @@ executable queryEth
                    RawMP
                    RLP
                    State
+                   Util
     buildable: True
     hs-source-dirs: src
 

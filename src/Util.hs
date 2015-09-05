@@ -1,6 +1,7 @@
 
 module Util (
-  ldbForEach
+  ldbForEach,
+  tab
   ) where
 
 import Control.Monad.Loops
@@ -25,3 +26,7 @@ ldbForEach dbDir f = do
       DB.iterNext i
       return ()
 
+tab::String->String
+tab [] = []
+tab ('\n':rest) = "\n  " ++ tab rest
+tab (c:rest) = c:tab rest
