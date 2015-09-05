@@ -7,6 +7,8 @@ module State (
 import Control.Monad
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Resource
+import qualified Data.ByteString as B
+import Data.Default
 import qualified Database.LevelDB as DB
 import System.Directory
 import System.FilePath
@@ -16,22 +18,36 @@ import qualified Data.NibbleString as N
 import Blockchain.Data.RLP
 
 import Blockchain.Constants
+import qualified Blockchain.Colors as CL
 import Blockchain.Data.AddressStateDB
 import Blockchain.Format
 import qualified Blockchain.Database.MerklePatricia.Internal as MP
 
 import Util
 
+nibbleStringToByteString::N.NibbleString->B.ByteString
+nibbleStringToByteString (N.EvenNibbleString x) = x
+nibbleStringToByteString _ = error "nibbleStringToByteString called for Odd length nibblestring"
+
 showVals::DB.DB->MP.SHAPtr->ResourceT IO ()
 showVals sdb sr = do
+  homeDir <- liftIO getHomeDirectory
+  db <- DB.open (homeDir </> ".ethereumH" </> "state") def
+    
+
   kvs <- MP.unsafeGetKeyVals MP.MPDB{MP.ldb=sdb, MP.stateRoot=sr} ""
   liftIO $ putStrLn $ "Number of items: " ++ show (length kvs) ++ "\n------------------------"
-  forM_ (filter (isNecessary . fst ) kvs) $ \(key, val) ->
+  forM_ (filter (isNecessary . fst ) kvs) $ \(key, val) -> do
+    unhashed <- DB.get db def $ nibbleStringToByteString key
+    let keyShowVal =
+          case unhashed of
+            Nothing -> error "missing value in unhash table"
+            Just x -> CL.yellow $ format x
     liftIO $ putStrLn $
-    show (pretty key)
-    ++ ":"
-    ++ tab ("\n" ++ format (rlpDecode $ rlpDeserialize $ rlpDecode val::AddressState))
-    ++ "\n----------------------------"
+      keyShowVal
+      ++ ":"
+      ++ tab ("\n" ++ format (rlpDecode $ rlpDeserialize $ rlpDecode val::AddressState))
+      ++ "\n----------------------------"
 
 doit::String->MP.SHAPtr->IO()
 doit theType sr = do
