@@ -32,7 +32,7 @@ nibbleStringToByteString _ = error "nibbleStringToByteString called for Odd leng
 showVals::DB.DB->MP.SHAPtr->ResourceT IO ()
 showVals sdb sr = do
   homeDir <- liftIO getHomeDirectory
-  db <- DB.open (homeDir </> ".ethereumH" </> "state") def
+  db <- DB.open (homeDir </> ".ethereumH" </> "hash") def
     
 
   kvs <- MP.unsafeGetKeyVals MP.MPDB{MP.ldb=sdb, MP.stateRoot=sr} ""
@@ -53,8 +53,8 @@ doit::String->MP.SHAPtr->IO()
 doit theType sr = do
   homeDir <- getHomeDirectory                     
   DB.runResourceT $ do
---    sdb <- DB.open (homeDir </> ".ethereum" </> "chaindata")
-    sdb <- DB.open (homeDir </> dbDir theType ++ stateDBPath)
+    sdb <- DB.open (homeDir </> ".ethereum" </> "chaindata")
+--    sdb <- DB.open (homeDir </> dbDir theType ++ stateDBPath)
            DB.defaultOptions{DB.cacheSize=1024}
            
     showVals sdb sr
