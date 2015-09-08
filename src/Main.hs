@@ -10,6 +10,7 @@ import Hash
 --import Init
 import Code
 import Raw
+import RLP
 import RawMP
 
 --import Debug.Trace
@@ -31,6 +32,7 @@ data Options =
   | Code{hash::String, db::String}
   | RawMP{stateRoot::String, filename::String}
   | Raw{filename::String}
+  | RLP{filename::String}
   | Init{hash::String, db::String}
   deriving (Show, Data, Typeable)
 
@@ -83,6 +85,12 @@ rawOptions =
     filename := def += typ "DBSTRING" += argPos 0
     ]
 
+rlpOptions::Annotate Ann
+rlpOptions = 
+  record RLP{filename=undefined} [
+    filename := def += typ "DBSTRING" += argPos 0
+    ]
+
 rawMPOptions::Annotate Ann
 rawMPOptions = 
   record RawMP{stateRoot=undefined, filename=undefined} [
@@ -91,7 +99,7 @@ rawMPOptions =
     ]
 
 options::Annotate Ann
-options = modes_ [stateOptions, blockOptions, blockGoOptions, hashOptions, initOptions, codeOptions, rawOptions, rawMPOptions]
+options = modes_ [stateOptions, blockOptions, blockGoOptions, hashOptions, initOptions, codeOptions, rawOptions, rlpOptions, rawMPOptions]
 
 
 --      += summary "Apply shims, reorganize, and generate to the input"
@@ -129,6 +137,9 @@ run Code{hash=h, db=db'} = do
 
 run Raw{filename=f} = do
   Raw.doit f
+
+run RLP{filename=f} = do
+  RLP.doit f
 
 run RawMP{stateRoot=sr, filename=f} = do
   RawMP.doit f (SHAPtr $ fst $ B16.decode $ BC.pack sr)

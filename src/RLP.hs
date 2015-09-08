@@ -17,20 +17,17 @@ import System.FilePath
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (</>))
 
 import Blockchain.Data.RLP
+import Blockchain.Format
 
-import DumpLevelDB
+import Util
 
 --import Debug.Trace
 
-doit::String->String->IO ()
-doit dbtype h = do
-  let options = DB.defaultOptions {
-        DB.createIfMissing=True, DB.cacheSize=1024}
-  dbDir <- typeToDB dbtype
-  runResourceT $ do
-    db <- DB.open (dbDir </> "blocks") def
-    showAllKeyVal db (show . pretty . rlpDeserialize)
-
+doit::String->IO ()
+doit filename = do
+  ldbForEach filename $ \key val -> do
+    putStrLn $ format key ++ ":" ++ tab ("\n" ++ formatRLPObject (rlpDeserialize val))
+    putStrLn "--------------------"
 
 
 
