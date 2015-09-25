@@ -13,11 +13,8 @@ import qualified Data.ByteString.Char8 as BC
 import Data.Default
 import qualified Database.LevelDB as DB
 import System.Directory
-import System.Environment
 import System.FilePath
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (</>))
-
-import Blockchain.Data.RLP
 
 --import Debug.Trace
 
@@ -48,8 +45,6 @@ showAllKeyVal db f = do
 
 showKeyVal::(B.ByteString->String)->String->String->Maybe String->IO ()
 showKeyVal f dbType dbName maybeKey = do
-  let options = DB.defaultOptions {
-        DB.createIfMissing=True, DB.cacheSize=1024}
   dbDir <- typeToDB dbType
   runResourceT $ do
     db <- DB.open (dbDir </> dbName) def
@@ -70,4 +65,5 @@ typeToDB "c" = do
   homeDir <- getHomeDirectory
   --return $ homeDir </> "Library" </> "Application Support" </> "Ethereum"
   return $ homeDir </> ".ethereum"
+typeToDB x = error $ "unknown type in call to typeToDB: " ++ x
 
