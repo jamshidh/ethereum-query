@@ -10,36 +10,25 @@ import Control.Monad.Loops
 import Control.Monad.IO.Class
 import Control.Monad.Trans.Resource
 import qualified Data.ByteString as B
-import qualified Data.ByteString.Base16 as B16
-import qualified Data.ByteString.Char8 as BC
 import Data.Default
 import qualified Database.LevelDB as DB
 import System.Directory
---import System.Environment
 import System.FilePath
 import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (</>))
 
 import Blockchain.Constants
-import Blockchain.Data.RLP
 
-import Blockchain.Data.BlockDB
-
-import DumpLevelDB
+import DumpLevelDB ()
 
 import Blockchain.Format
 
 --import Debug.Trace
 
-formatBlock::Block->String
-formatBlock = format
-
-
-              
 ldbForEach::FilePath->(B.ByteString->B.ByteString->IO ())->IO ()
 --doit dbtype h = showKeyVal (formatBlock . rlpDecode . rlpDeserialize) dbtype "blocks" (if h == "-" then Nothing else Just h)
-ldbForEach dbDir f = do
+ldbForEach dbDir' f = do
   runResourceT $ do
-    db <- DB.open (dbDir </> "blockchain") def
+    db <- DB.open (dbDir' </> "blockchain") def
     i <- DB.iterOpen db def
     DB.iterFirst i
     whileM_ (DB.iterValid i) $ do
@@ -51,10 +40,10 @@ ldbForEach dbDir f = do
 
 doit::String->String->IO ()
 --doit dbtype h = showKeyVal (formatBlock . rlpDecode . rlpDeserialize) dbtype "blocks" (if h == "-" then Nothing else Just h)
-doit dbtype h = do
-  dbDir <- fmap ((++ dbDir h) . (++ "/")) getHomeDirectory
+doit _ h = do
+  dbDir' <- fmap ((++ dbDir h) . (++ "/")) getHomeDirectory
 
-  ldbForEach dbDir $ \key val -> do
+  ldbForEach dbDir' $ \key val -> do
       when (B.isPrefixOf "block" key) $
         putStrLn $ "----------\n"
                      ++ show (pretty key)

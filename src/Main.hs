@@ -128,9 +128,11 @@ run BlockGO{hash=h, db=db'} = do
 run Hash{hash=h, db=db'} = do
   Hash.doit db' h
 
-run Init{hash=h, db=db'} = do
-  undefined
+--run Init{hash=h, db=db'} = do
 --  Init.doit db' h
+
+run Init{} = do
+  undefined
 
 run Code{hash=h, db=db'} = do
   Code.doit db' h

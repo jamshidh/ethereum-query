@@ -12,12 +12,10 @@ import Data.Default
 import qualified Database.LevelDB as DB
 import System.Directory
 import System.FilePath
-import Text.PrettyPrint.ANSI.Leijen hiding ((<$>), (</>))
 
 import qualified Data.NibbleString as N
 import Blockchain.Data.RLP
 
-import Blockchain.Constants
 import qualified Blockchain.Colors as CL
 import Blockchain.Data.AddressStateDB
 import Blockchain.Format
@@ -50,7 +48,7 @@ showVals sdb sr = do
       ++ "\n----------------------------"
 
 doit::String->MP.SHAPtr->IO()
-doit theType sr = do
+doit _ sr = do
   homeDir <- getHomeDirectory                     
   DB.runResourceT $ do
     sdb <- DB.open (homeDir </> ".ethereum" </> "chaindata")
